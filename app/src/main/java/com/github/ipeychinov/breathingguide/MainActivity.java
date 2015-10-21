@@ -23,12 +23,15 @@ public class MainActivity extends AppCompatActivity{
 
         initVar();
 
+        //setup seekBar listeners
+        //breath In bar
         seekBarIn.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 seekBarInProgress.setText("" + (progress + 3));
                 piModIn = 0.6 + 0.19*(10-progress);
+                //change In graph
                 DrawView.adjustInGraph(piModIn);
             }
 
@@ -42,11 +45,13 @@ public class MainActivity extends AppCompatActivity{
             }
         });
 
+        //breath Out bar
         seekBarOut.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 seekBarOutProgress.setText("" + (progress + 3));
                 piModOut = 0.6 + 0.19*(10-progress);
+                //change Out graph
                 DrawView.adjustOutGraph(piModOut);
             }
 
@@ -61,6 +66,7 @@ public class MainActivity extends AppCompatActivity{
         });
     }
 
+    //Initializes the class members
     private void initVar() {
         seekBarIn = (SeekBar) findViewById(R.id.seekBarIn);
         seekBarOut = (SeekBar) findViewById(R.id.seekBarOut);

@@ -187,6 +187,7 @@ public class MyPolygon {
         }
     }
 
+    //Shifts the Polygon deltaX points to the left
     public void translate(int deltaX){
         for(int i = 0; i < npoints - deltaX; i++){
             ypoints[i] = ypoints[i + deltaX];
@@ -213,7 +214,7 @@ public class MyPolygon {
         }
     }
 
-    //Adjusts the Polygon according to new Math.PI modifiers
+    //Adjusts the Polygon middle
     //@param midPointY - Y coordinate of the previous middle point
     public void adjust(int midPointY) {
         int midPointX = npoints / 2;
@@ -222,6 +223,7 @@ public class MyPolygon {
         //initiates it with new values
         initPolygon();
 
+        //finds a similar middle point to the right of the center
         for(int i = npoints/2; i < npoints; i++){
             if(ypoints[midPointX] + 1 > midPointY && ypoints[midPointX] - 1 < midPointY){
                 if(findPointDirection(i) == midDirectionFlag) {
@@ -230,27 +232,16 @@ public class MyPolygon {
                 }
             }
         }
-
-        /*//shifts the new polygon until it has the same middle point Y coordinate
-        int newMidDirectionFlag = 0;
-        while (true) {
-            newMidDirectionFlag = findMidPointDirection();
-            if (midDirectionFlag == newMidDirectionFlag) {
-                if (ypoints[midPointX] + 1 > midPointY && ypoints[midPointX] - 1 < midPointY) break;
-            }
-            translate();
-        }*/
     }
 
+    //Adjusts the Polygon according to new Math.PI modifier
+    //@param piModIn - Math.PI modifier
     public void adjustInGraph(double piModIn){
+        //saves the Y coordinate of the previous middle point
         int midPointY = ypoints[npoints/2];
 
-        //resets the polygon
-        xpoints = new int[npoints];
-        ypoints = new int[npoints];
-
+        //reset the breathInGraph and the last element index
         breathInGraph.clear();
-
         breathInIndex = 0;
         breathOutIndex = 0;
 
@@ -260,12 +251,11 @@ public class MyPolygon {
         boolean breathInFull = false;
         boolean breathInFound = false;
 
-        //Loop for filling the graphs with points
+        //Loop for filling the graph with points
         for (int x = 0, y = 0; ; x++) {
             //Break out of endless loop when graph is full
             if (breathInFull) break;
 
-            // BreathInGraph
             derivative = roundDerivative((50 * Math.PI * piModIn * Math.cos((Math.PI * piModIn * x) / 100.0) / (-100.0)));
             y = 100 - (int) (50 * Math.sin((x / 100.0) * piModIn * Math.PI));
 
@@ -290,15 +280,13 @@ public class MyPolygon {
         adjust(midPointY);
     }
 
+    //Adjusts the Polygon according to new Math.PI modifier
+    //@param piModOut - Math.PI modifier
     public void adjustOutGraph(double piModOut){
         int midPointY = ypoints[npoints/2];
 
-        //resets the polygon
-        xpoints = new int[npoints];
-        ypoints = new int[npoints];
-
+        //reset the breathOutGraph and the last element index
         breathOutGraph.clear();
-
         breathInIndex = 0;
         breathOutIndex = 0;
 
@@ -310,10 +298,9 @@ public class MyPolygon {
 
         //Loop for filling the graphs with points
         for (int x = 0, y = 0; ; x++) {
-            //Break out of endless loop when graphs are full
+            //Break out of endless loop when graph is full
             if (breathOutFull) break;
 
-            // BreathOutGraph
             derivative = roundDerivative((50 * Math.PI * piModOut * Math.cos((Math.PI * piModOut * x) / 100.0) / (-100.0)));
             y = 100 - (int) (50 * Math.sin((x / 100.0) * piModOut * Math.PI));
 
@@ -338,7 +325,8 @@ public class MyPolygon {
         adjust(midPointY);
     }
 
-    //Determines the graph to which the middle point belongs
+    //Determines the graph to which the point belongs
+    //@param point - target point
     private int findPointDirection(int point) {
         int countBack = npoints;
         int tempDirectionFlag = directionFlag;
