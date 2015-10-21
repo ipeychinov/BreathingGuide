@@ -29,8 +29,8 @@ public class MainActivity extends AppCompatActivity{
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                seekBarInProgress.setText("" + (progress + 3));
-                piModIn = 0.6 + 0.19*(10-progress);
+                seekBarInProgress.setText(String.format("%.1f", ((double)progress/10.0 + 3)));
+                piModIn = 0.6 + 0.19*(100.0-(double)progress)/10.0;
                 //change In graph
                 DrawView.adjustInGraph(piModIn);
             }
@@ -49,8 +49,8 @@ public class MainActivity extends AppCompatActivity{
         seekBarOut.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                seekBarOutProgress.setText("" + (progress + 3));
-                piModOut = 0.6 + 0.19*(10-progress);
+                seekBarInProgress.setText(String.format("%.1f", ((double)progress/10.0 + 3)));
+                piModOut = 0.6 + 0.19*(100.0-(double)progress)/10.0;
                 //change Out graph
                 DrawView.adjustOutGraph(piModOut);
             }
