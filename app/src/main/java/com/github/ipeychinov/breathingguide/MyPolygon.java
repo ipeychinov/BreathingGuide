@@ -1,5 +1,7 @@
 package com.github.ipeychinov.breathingguide;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +51,8 @@ public class MyPolygon {
 
         breathInIndex = 0;
         breathOutIndex = 0;
+
+        directionFlag = 0;
 
         initGraph(2.5, 2.5);
         initPolygon();
@@ -216,16 +220,14 @@ public class MyPolygon {
 
     //Adjusts the Polygon middle
     //@param midPointY - Y coordinate of the previous middle point
-    public void adjust(int midPointY) {
-        int midPointX = npoints / 2;
-        int midDirectionFlag = findPointDirection(npoints / 2);
+    public void adjust(int midPointY, int midDirectionFlag) {
 
         //initiates it with new values
         initPolygon();
 
         //finds a similar middle point to the right of the center
-        for(int i = npoints/2; i < npoints; i++){
-            if(ypoints[midPointX] + 1 > midPointY && ypoints[midPointX] - 1 < midPointY){
+        for(int i = npoints-1; i > npoints/2; i--){
+            if(ypoints[i] + 1 > midPointY && ypoints[i] - 1 < midPointY){
                 if(findPointDirection(i) == midDirectionFlag) {
                     translate(i - npoints/2);
                     break;
@@ -239,6 +241,7 @@ public class MyPolygon {
     public void adjustInGraph(double piModIn){
         //saves the Y coordinate of the previous middle point
         int midPointY = ypoints[npoints/2];
+        int midDirectionFlag = findPointDirection(npoints / 2);
 
         //reset the breathInGraph and the last element index
         breathInGraph.clear();
@@ -256,7 +259,7 @@ public class MyPolygon {
             //Break out of endless loop when graph is full
             if (breathInFull) break;
 
-            derivative = roundDerivative((50 * Math.PI * piModIn * Math.cos((Math.PI * piModIn * x) / 100.0) / (-100.0)));
+            derivative = roundDerivative((50.0 * Math.PI * piModIn * Math.cos((Math.PI * piModIn * x) / 100.0) / (-100.0)));
             y = 100 - (int) (50 * Math.sin((x / 100.0) * piModIn * Math.PI));
 
             //When derivative == 0 and y > 100 we have a Minimum
@@ -277,13 +280,14 @@ public class MyPolygon {
             }
         }
 
-        adjust(midPointY);
+        adjust(midPointY, midDirectionFlag);
     }
 
     //Adjusts the Polygon according to new Math.PI modifier
     //@param piModOut - Math.PI modifier
     public void adjustOutGraph(double piModOut){
         int midPointY = ypoints[npoints/2];
+        int midDirectionFlag = findPointDirection(npoints / 2);
 
         //reset the breathOutGraph and the last element index
         breathOutGraph.clear();
@@ -301,7 +305,7 @@ public class MyPolygon {
             //Break out of endless loop when graph is full
             if (breathOutFull) break;
 
-            derivative = roundDerivative((50 * Math.PI * piModOut * Math.cos((Math.PI * piModOut * x) / 100.0) / (-100.0)));
+            derivative = roundDerivative((50.0 * Math.PI * piModOut * Math.cos((Math.PI * piModOut * x) / 100.0) / (-100.0)));
             y = 100 - (int) (50 * Math.sin((x / 100.0) * piModOut * Math.PI));
 
             //When derivative == 0 and y < 100 we have a Maximum
@@ -322,7 +326,7 @@ public class MyPolygon {
             }
         }
 
-        adjust(midPointY);
+        adjust(midPointY, midDirectionFlag);
     }
 
     //Determines the graph to which the point belongs
@@ -338,6 +342,8 @@ public class MyPolygon {
             countBack -= breathInIndex;
             tempDirectionFlag = -1;
         }
+
+        if(point > countBack) return tempDirectionFlag;
 
         while (true) {
             if (tempDirectionFlag < 0) {

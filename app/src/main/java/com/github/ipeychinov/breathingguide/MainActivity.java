@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity{
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
             }
 
             @Override
@@ -57,7 +56,6 @@ public class MainActivity extends AppCompatActivity{
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
             }
 
             @Override
