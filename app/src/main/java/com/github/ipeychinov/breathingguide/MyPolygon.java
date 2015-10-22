@@ -104,7 +104,7 @@ public class MyPolygon {
                     breathInFull = true;
                     breathInFound = false;
                 } else {
-                    breathInGraph.add(y*2);
+                    breathInGraph.add(y * 2);
                 }
             }
 
@@ -125,7 +125,7 @@ public class MyPolygon {
                     breathOutFull = true;
                     breathOutFound = false;
                 } else {
-                    breathOutGraph.add(y*2);
+                    breathOutGraph.add(y * 2);
                 }
             }
         }
@@ -192,12 +192,12 @@ public class MyPolygon {
     }
 
     //Shifts the Polygon deltaX points to the left
-    public void translate(int deltaX){
-        for(int i = 0; i < npoints - deltaX; i++){
+    public void translate(int deltaX) {
+        for (int i = 0; i < npoints - deltaX; i++) {
             ypoints[i] = ypoints[i + deltaX];
         }
 
-        for(int i = npoints - deltaX; i < npoints; i++){
+        for (int i = npoints - deltaX; i < npoints; i++) {
             if (directionFlag < 0) {
                 if (breathOutIndex < breathOutGraph.size()) {
                     ypoints[i] = breathOutGraph.get(breathOutIndex++);
@@ -220,17 +220,48 @@ public class MyPolygon {
 
     //Adjusts the Polygon middle
     //@param midPointY - Y coordinate of the previous middle point
-    public void adjust(int midPointY, int midDirectionFlag) {
+    public void adjust(int midPointY, int midDirectionFlag, int adjust) {
 
         //initiates it with new values
         initPolygon();
 
-        //finds a similar middle point to the right of the center
-        for(int i = npoints-1; i > npoints/2; i--){
-            if(ypoints[i] + 1 > midPointY && ypoints[i] - 1 < midPointY){
-                if(findPointDirection(i) == midDirectionFlag) {
-                    translate(i - npoints/2);
-                    break;
+        if (adjust <= 0) {
+            //finds a similar middle point to the right of the center
+            for (int i = npoints - 1; i > npoints / 2; i--) {
+                if (ypoints[i] + 1 > midPointY && ypoints[i] - 1 < midPointY) {
+                    if (findPointDirection(i) == midDirectionFlag) {
+                        translate(i - npoints / 2);
+                        break;
+                    }
+                }
+            }
+        }else{
+            int tempAdjust = -1;
+            if(midDirectionFlag > 0){
+                for(int i = 1; i < breathInGraph.size(); i++){
+                    if(breathInGraph.size() / i > adjust){
+                        tempAdjust = i;
+                    }
+                }
+                for(int i = npoints - 1; i > npoints / 2; i--){
+                    if(findPointDirection(i) == midDirectionFlag){
+                        if(breathInGraph.get(tempAdjust) == ypoints[i]){
+                            translate(i - npoints /2);
+                        }
+                    }
+                }
+            }else{
+                for(int i = 1; i < breathOutGraph.size(); i++){
+                    if(breathOutGraph.size() / i > adjust){
+                        tempAdjust = i;
+                    }
+                }
+                for(int i = npoints - 1; i > npoints / 2; i--){
+                    if(findPointDirection(i) == midDirectionFlag){
+                        if(breathOutGraph.get(tempAdjust) == ypoints[i]){
+                            translate(i - npoints /2);
+                        }
+                    }
                 }
             }
         }
@@ -238,10 +269,22 @@ public class MyPolygon {
 
     //Adjusts the Polygon according to new Math.PI modifier
     //@param piModIn - Math.PI modifier
-    public void adjustInGraph(double piModIn){
+    public void adjustInGraph(double piModIn) {
         //saves the Y coordinate of the previous middle point
-        int midPointY = ypoints[npoints/2];
+        int midPointY = ypoints[npoints / 2];
         int midDirectionFlag = findPointDirection(npoints / 2);
+        int balance = -1;
+        if (midDirectionFlag > 0) {
+            for (int i = 0; i < breathInGraph.size(); i++) {
+                if (midPointY == breathInGraph.get(i)) {
+                    if (i != 0) {
+                        balance = breathInGraph.size() / i;
+                    } else {
+                        balance = 0;
+                    }
+                }
+            }
+        }
 
         //reset the breathInGraph and the last element index
         breathInGraph.clear();
@@ -275,20 +318,31 @@ public class MyPolygon {
                     breathInFull = true;
                     breathInFound = false;
                 } else {
-                    breathInGraph.add(y*2);
+                    breathInGraph.add(y * 2);
                 }
             }
         }
 
-        adjust(midPointY, midDirectionFlag);
+        adjust(midPointY, midDirectionFlag, balance);
     }
 
     //Adjusts the Polygon according to new Math.PI modifier
     //@param piModOut - Math.PI modifier
-    public void adjustOutGraph(double piModOut){
-        int midPointY = ypoints[npoints/2];
+    public void adjustOutGraph(double piModOut) {
+        int midPointY = ypoints[npoints / 2];
         int midDirectionFlag = findPointDirection(npoints / 2);
-
+        int balance = -1;
+        if (midDirectionFlag < 0) {
+            for (int i = 0; i < breathOutGraph.size(); i++) {
+                if (midPointY == breathOutGraph.get(i)) {
+                    if (i != 0) {
+                        balance = breathOutGraph.size() / i;
+                    } else {
+                        balance = 0;
+                    }
+                }
+            }
+        }
         //reset the breathOutGraph and the last element index
         breathOutGraph.clear();
         breathInIndex = 0;
@@ -321,12 +375,12 @@ public class MyPolygon {
                     breathOutFull = true;
                     breathOutFound = false;
                 } else {
-                    breathOutGraph.add(y*2);
+                    breathOutGraph.add(y * 2);
                 }
             }
         }
 
-        adjust(midPointY, midDirectionFlag);
+        adjust(midPointY, midDirectionFlag, balance);
     }
 
     //Determines the graph to which the point belongs
@@ -343,7 +397,7 @@ public class MyPolygon {
             tempDirectionFlag = -1;
         }
 
-        if(point > countBack) return tempDirectionFlag;
+        if (point > countBack) return tempDirectionFlag;
 
         while (true) {
             if (tempDirectionFlag < 0) {
